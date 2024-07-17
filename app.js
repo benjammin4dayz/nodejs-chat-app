@@ -5,7 +5,8 @@ const http = require('http');
 const path = require('path');
 
 // resolve env config
-const HOSTNAME = process.env['HOST'] || 'localhost';
+const HOST = process.env['HOST'] || 'localhost';
+const USE_SSL = process.env['USE_SSL'] === 'true';
 const HTTP_PORT = process.env['HTTP_PORT'] || 80;
 const CHAT_PORT = process.env['CHAT_PORT'] || 8000;
 
@@ -65,7 +66,12 @@ const httpServer = http.createServer((req, res) => {
   if (req.url === '/rooms') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(
-      JSON.stringify([{ name: 'Main', url: `ws://${HOSTNAME}:${CHAT_PORT}` }])
+      JSON.stringify([
+        {
+          name: 'Main',
+          url: `${USE_SSL ? 'wss' : 'ws'}://${HOST}:${CHAT_PORT}`,
+        },
+      ])
     );
     return;
   }

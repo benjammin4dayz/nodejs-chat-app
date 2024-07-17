@@ -37,7 +37,7 @@ npm start
 
 ### Docker
 
-<!-- docker build -t nodejs-chat-app . -->
+<!-- docker build -t benjammin4dayz/nodejs-chat-app:tag . -->
 
 #### Example using docker run:
 
@@ -45,19 +45,8 @@ npm start
 docker run -p 80:80 -p 8000:8000 benjammin4dayz/nodejs-chat-app
 ```
 
-#### Example using docker-compose:
+#### Example using [docker-compose](./docker-compose.yml):
 
-```yaml
-version: '3.9'
-
-services:
-  server:
-    image: benjammin4dayz/nodejs-chat-app
-    environment:
-      - HOST=localhost
-      - HTTP_PORT=80
-      - CHAT_PORT=8000
-    ports:
-      - '80:80'
-      - '8000:8000'
+```bash
+docker compose up
 ```
