@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Node.js Chat App</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="chat" class="chat">
+      <div id="messageBox" class="chat__message-box"></div>
+      <form id="chat-form" onsubmit="event.preventDefault();">
+        <input
+          id="chatInput"
+          class="chat__message-input"
+          type="text"
+          placeholder="Type your message"
+        />
+        <button id="messageSendButton" class="button" type="submit">
+          Send
+        </button>
+      </form>
+    </div>
+    <script src="./chat-client.js"></script>
+  </body>
+</html>
