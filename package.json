@@ -1,6 +1,6 @@
 {
   "name": "nodejs-chat-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "repository": {
     "type": "git",
@@ -8,10 +8,10 @@
   },
   "license": "MIT",
   "author": "benjammin4dayz",
-  "main": "app.js",
+  "main": "app/index.js",
   "scripts": {
-    "dev": "nodemon --ignore 'node_modules' --watch './",
-    "start": "node app.js"
+    "start": "node app/index.js",
+    "dev": "nodemon --watch ./app --ignore ./app/public"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
