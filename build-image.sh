@@ -13,6 +13,8 @@ echo "$0 -> $image:$version"
 
 docker build -t $image:$version .
 
-if [[ $1 == "-l" || $1 == "--latest" ]]; then
+if [ $? -eq 0 ] && [[ $1 == "-p" || $1 == "--push" ]]; then
+    docker push $image:$version
     docker tag $image:$version $image:latest
+    docker push $image:latest
 fi
