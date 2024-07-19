@@ -7,20 +7,13 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div id="chat" class="chat">
+    <main class="chat">
       <div id="messageBox" class="chat__message-box"></div>
-      <form id="chat-form" onsubmit="event.preventDefault();">
-        <input
-          id="chatInput"
-          class="chat__message-input"
-          type="text"
-          placeholder="Type your message"
-        />
-        <button id="messageSendButton" class="button" type="submit">
-          Send
-        </button>
+      <form class="chat__form" onsubmit="event.preventDefault();">
+        <input id="messageInput" type="text" placeholder="Type your message" />
+        <button id="messageSubmit" class="button" type="submit">Send</button>
       </form>
-    </div>
+    </main>
     <script src="./chat-client.js"></script>
   </body>
 </html>
