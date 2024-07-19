@@ -6,9 +6,9 @@ const path = require('path');
 
 // resolve env config
 const HOST = process.env['HOST'] || 'localhost';
-const USE_SSL = process.env['USE_SSL'] === 'true';
-const HTTP_PORT = process.env['HTTP_PORT'] || 80;
-const CHAT_PORT = process.env['CHAT_PORT'] || 8000;
+const USE_SSL = String(process.env['USE_SSL']).toLowerCase() === 'true';
+const HTTP_PORT = Number.parseInt(process.env['HTTP_PORT']) || 80;
+const CHAT_PORT = Number.parseInt(process.env['CHAT_PORT']) || 8000;
 
 // start the websocket server for the chat room
 const chatServer = new WebSocketServer({ port: CHAT_PORT });
@@ -19,39 +19,31 @@ const getUsername = () => `Chatter ${++seqChat}`;
 
 // handle new client connections
 chatServer.on('connection', ws => {
+  const getUserCount = () => chatServer.clients.size + ' active';
+  const broadcast = message => {
+    console.log(message);
+    chatServer.clients.forEach(client => {
+      client.readyState === ws.OPEN && client.send(message);
+    });
+  };
+
   // assign a username to the client upon connection
   const user = getUsername();
-  console.log(`[SERVER] ${user} connected`);
+  ws.send(`[PRIVATE] Welcome to the chat, ${user}!`);
+  broadcast(`[SYSTEM] ${user} joined the chat (${getUserCount()})`);
 
-  // broadcast that a new user has joined the chat room
-  chatServer.clients.forEach(client => {
-    client.readyState === ws.OPEN &&
-      client.send(`BROADCAST: ${user} joined the chat`);
-  });
-
-  // broadcast that a user has left the chat room
+  // handle client disconnects
   ws.on('close', () => {
-    chatServer.clients.forEach(client => {
-      client.readyState === ws.OPEN &&
-        client.send(`BROADCAST: ${user} left the chat`);
-    });
+    broadcast(`[SYSTEM] ${user} left the chat (${getUserCount()})`);
   });
 
   // handle messages from this client
   ws.on('message', data => {
     const messageContent = data.toString('utf8');
+    if (!messageContent) return; // do not accept empty messages
 
-    // do not accept empty messages
-    if (messageContent) {
-      // prefix the user's assigned name to their message content
-      const message = `${user}: ${messageContent}`;
-      console.log(message);
-
-      // forward this client's messages to all open clients
-      chatServer.clients.forEach(client => {
-        client.readyState === ws.OPEN && client.send(message);
-      });
-    }
+    // prefix the user's assigned name to their message content and send it
+    broadcast(`${user}: ${messageContent}`);
   });
 
   // log errors from this client in the server console
@@ -79,17 +71,15 @@ const httpServer = http.createServer((req, res) => {
   // serve static files from public/
   const filePath = path.join(
     __dirname,
-    './public',
+    'public',
     req.url === '/' ? 'index.html' : req.url
   );
-
   fs.access(filePath, fs.constants.F_OK, err => {
     if (err) {
       res.writeHead(404);
       res.end('File not found');
       return;
     }
-
     fs.readFile(filePath, (err, data) => {
       if (err) {
         res.writeHead(500);
@@ -97,7 +87,6 @@ const httpServer = http.createServer((req, res) => {
         console.log(err);
         return;
       }
-
       res.writeHead(200, { 'Content-Type': getContentType(filePath) });
       res.end(data);
     });

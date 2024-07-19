@@ -19,7 +19,6 @@ function connect(url, retryTime = 1000) {
   // connected to chat server
   socket.onopen = () => {
     retryTime = 1000; // reset to initial value
-    addMessage('Welcome to the chat room!');
   };
 
   // disconnected from chat server
@@ -45,6 +44,7 @@ function connect(url, retryTime = 1000) {
 
   // send new message to chat server
   messageSubmit.onclick = () => {
+    if (!messageInput.value) return;
     socket.send(messageInput.value);
     messageInput.value = '';
   };
