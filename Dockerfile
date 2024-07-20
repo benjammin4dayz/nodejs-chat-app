@@ -4,7 +4,7 @@ RUN apk add --no-cache nodejs npm
 
 WORKDIR /usr/src
 COPY ./app ./app
-COPY package*.json ./
+COPY ./package*.json ./
 RUN npm ci
 
 EXPOSE 80 8000

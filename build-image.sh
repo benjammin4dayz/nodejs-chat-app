@@ -1,6 +1,6 @@
 #!/bin/bash
 meta() {
-    cat package.json | grep $1 | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]'
+    cat $(dirname "$0")/package.json | grep $1 | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]'
 }
 
 author=$(meta author)

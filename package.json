@@ -11,7 +11,8 @@
   "main": "app/index.js",
   "scripts": {
     "start": "node app/index.js",
-    "dev": "nodemon --watch .env --watch ./app --ignore ./app/public"
+    "dev": "nodemon --watch .env --watch ./app --ignore ./app/public",
+    "docker:build": "bash ./build-image.sh"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

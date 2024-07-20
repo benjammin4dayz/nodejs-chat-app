@@ -37,7 +37,8 @@ npm start
 
 ### Docker
 
-<!-- docker build -t benjammin4dayz/nodejs-chat-app:tag . -->
+> [!IMPORTANT]
+> Ensure that the chat server's port (default 8000) is mapped to the same port on the host machine.
 
 #### Example using docker run:
 
