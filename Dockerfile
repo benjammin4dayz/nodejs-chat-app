@@ -7,5 +7,5 @@ COPY ./app ./app
 COPY ./package*.json ./
 RUN npm ci
 
-EXPOSE 80 8000
+EXPOSE 80
 CMD ["npm", "start"]

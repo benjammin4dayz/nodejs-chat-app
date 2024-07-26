@@ -1,12 +1,8 @@
-fetch(window.location.origin + '/rooms')
-  .then(res => res.json())
-  .then(rooms => {
-    connect(rooms[0].url);
-  });
+connect(window.location.origin);
 
 function connect(url, retryTime = 1000) {
   const { messageBox, messageInput, messageSubmit } = pageElements();
-  const socket = new WebSocket(url);
+  const chat = new WebSocket(url);
 
   const addMessage = message => {
     const el = document.createElement('div');
@@ -16,13 +12,11 @@ function connect(url, retryTime = 1000) {
     el.scrollIntoView({ behavior: 'smooth', block: 'end' });
   };
 
-  // connected to chat server
-  socket.onopen = () => {
+  chat.onopen = () => {
     retryTime = 1000; // reset to initial value
   };
 
-  // disconnected from chat server
-  socket.onclose = () => {
+  chat.onclose = () => {
     if (retryTime === 1000) {
       addMessage('Disconnected...');
     } else {
@@ -37,15 +31,13 @@ function connect(url, retryTime = 1000) {
     setTimeout(() => connect(url, exponentialBackoffTime), retryTime);
   };
 
-  // received new message from chat server
-  socket.onmessage = event => {
+  chat.onmessage = event => {
     addMessage(event.data);
   };
 
-  // send new message to chat server
   messageSubmit.onclick = () => {
     if (!messageInput.value) return;
-    socket.send(messageInput.value);
+    chat.send(messageInput.value);
     messageInput.value = '';
   };
 }

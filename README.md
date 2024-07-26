@@ -37,17 +37,20 @@ npm start
 
 ### Docker
 
-> [!IMPORTANT]
-> Ensure that the chat server's port (default 8000) is mapped to the same port on the host machine.
-
 #### Example using docker run:
 
 ```bash
-docker run -p 80:80 -p 8000:8000 benjammin4dayz/nodejs-chat-app
+docker run -p 80:80 benjammin4dayz/nodejs-chat-app
 ```
 
-#### Example using [docker-compose](./docker-compose.yml):
+#### Example using docker-compose:
 
-```bash
-docker compose up
+```yaml
+version: '3.9'
+
+services:
+  server:
+    image: benjammin4dayz/nodejs-chat-app
+    ports:
+      - '80:80'
 ```

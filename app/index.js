@@ -1,28 +1,42 @@
 require('dotenv').config();
-const { WebSocketServer } = require('ws');
-const fs = require('fs');
 const http = require('http');
-const path = require('path');
+const { join } = require('path');
+const serveStatic = require('serve-static');
+const { WebSocketServer } = require('ws');
 
 // resolve env config
-const HOST = process.env['HOST'] || 'localhost';
-const USE_SSL = String(process.env['USE_SSL']).toLowerCase() === 'true';
-const HTTP_PORT = Number.parseInt(process.env['HTTP_PORT']) || 80;
-const CHAT_PORT = Number.parseInt(process.env['CHAT_PORT']) || 8000;
+const PORT = Number.parseInt(process.env.PORT) || 80;
 
-// start the websocket server for the chat room
-const chatServer = new WebSocketServer({ port: CHAT_PORT });
+// configure http static server
+const server = http.createServer((req, res) => {
+  const publicRoot = join(__dirname, 'public');
+  serveStatic(publicRoot, {
+    index: 'index.html',
+  })(req, res, err => {
+    if (!err) {
+      // redirect missed requests back to the base url
+      res.writeHead(302, { Location: '/' });
+      res.end();
+    } else {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Internal Error');
+    }
+  });
+});
+
+// configure the websocket for the chat room
+const wss = new WebSocketServer({ server });
 
 // simple name assignment to distinguish between users in chat
 let seqChat = 0;
 const getUsername = () => `Chatter ${++seqChat}`;
 
 // handle new client connections
-chatServer.on('connection', ws => {
-  const getUserCount = () => chatServer.clients.size + ' active';
+wss.on('connection', ws => {
+  const getUserCount = () => wss.clients.size + ' active';
   const broadcast = message => {
     console.log(message);
-    chatServer.clients.forEach(client => {
+    wss.clients.forEach(client => {
       client.readyState === ws.OPEN && client.send(message);
     });
   };
@@ -52,63 +66,5 @@ chatServer.on('connection', ws => {
   });
 });
 
-// configure http server route handlers
-const httpServer = http.createServer((req, res) => {
-  // client can GET this route to determine the websocket address
-  if (req.url === '/rooms') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(
-      JSON.stringify([
-        {
-          name: 'Main',
-          url: `${USE_SSL ? 'wss' : 'ws'}://${HOST}:${CHAT_PORT}`,
-        },
-      ])
-    );
-    return;
-  }
-
-  // serve static files from public/
-  const filePath = path.join(
-    __dirname,
-    'public',
-    req.url === '/' ? 'index.html' : req.url
-  );
-  fs.access(filePath, fs.constants.F_OK, err => {
-    if (err) {
-      res.writeHead(404);
-      res.end('File not found');
-      return;
-    }
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Internal server error');
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': getContentType(filePath) });
-      res.end(data);
-    });
-  });
-});
-
 // start the http server to handle web requests
-httpServer.listen(HTTP_PORT, () =>
-  console.log(`Server started on port ${HTTP_PORT}`)
-);
-
-function getContentType(filePath) {
-  const extension = path.extname(filePath);
-
-  switch (extension) {
-    case '.html':
-      return 'text/html';
-    case '.js':
-      return 'text/javascript';
-    case '.css':
-      return 'text/css';
-    default:
-      return 'application/octet-stream';
-  }
-}
+server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

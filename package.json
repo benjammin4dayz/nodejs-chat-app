@@ -1,6 +1,6 @@
 {
   "name": "nodejs-chat-app",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": true,
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
+    "serve-static": "^1.15.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
